@@ -5,6 +5,8 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
+const friendRoutes = require('./routes/friends');
+const userRoutes = require('./routes/users');
 
 const app = express();
 
@@ -13,12 +15,11 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Auth routes
 app.use('/api/auth', authRoutes);
-// Post routes
 app.use('/api/posts', postRoutes);
+app.use('/api/friends', friendRoutes);
+app.use('/api/users', userRoutes);
 
-// Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is running!' });
 });

@@ -23,6 +23,10 @@ exports.getFeed = async (req, res) => {
     const posts = await Post.find({ visibility: 'public' })
       .sort({ created_at: -1 })
       .populate('author_id', 'name avatar')
+      .populate({
+        path: 'comments',
+        populate: { path: 'user_id', select: 'name avatar' }
+      })
       .limit(20);
     res.json(posts);
   } catch (err) {

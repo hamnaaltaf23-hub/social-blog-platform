@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
+import Friends from './pages/Friends';
+import Navbar from './components/Navbar';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -15,8 +17,39 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-      <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <Home />
+            </>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/feed"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <Feed />
+            </>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/friends"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <Friends />
+            </>
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

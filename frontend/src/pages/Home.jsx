@@ -11,8 +11,17 @@ const Home = () => {
           <h1 className="text-2xl font-bold">Welcome, {user?.name || 'User'}!</h1>
           <p className="text-gray-600">Email: {user?.email}</p>
           <div className="mt-4 space-x-4">
-            <Link to="/feed" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <Link 
+              to="/feed" 
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
               Go to Feed
+            </Link>
+            <Link 
+              to="/friends" 
+              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+            >
+              Friends
             </Link>
             <button
               onClick={logout}
