@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
 import Friends from './pages/Friends';
+import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 
 function ProtectedRoute({ children }) {
@@ -46,6 +47,17 @@ function AppRoutes() {
             <>
               <Navbar />
               <Friends />
+            </>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <Admin />
             </>
           </ProtectedRoute>
         }

@@ -6,16 +6,19 @@ const Friends = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
   const { user } = useAuth();
   const token = localStorage.getItem('token');
 
   // Fetch pending friend requests
   const fetchPendingRequests = async () => {
     try {
+      console.log('Fetching pending requests...');
       const res = await fetch('http://localhost:5000/api/friends/pending', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       const data = await res.json();
+      console.log('Pending requests:', data);
       setPendingRequests(data);
     } catch (err) {
       console.error('Error fetching pending requests:', err);
@@ -26,10 +29,12 @@ const Friends = () => {
   const searchUsers = async () => {
     if (!searchTerm.trim()) return;
     try {
+      console.log('Searching for:', searchTerm);
       const res = await fetch(`http://localhost:5000/api/users/search?email=${searchTerm}`, {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       const data = await res.json();
+      console.log('Search results:', data);
       setSearchResults(data);
     } catch (err) {
       console.error('Search error:', err);
@@ -39,6 +44,7 @@ const Friends = () => {
   // Send friend request
   const sendRequest = async (toUserId) => {
     try {
+      console.log('Sending request to:', toUserId);
       const res = await fetch('http://localhost:5000/api/friends/send', {
         method: 'POST',
         headers: {
@@ -48,17 +54,21 @@ const Friends = () => {
         body: JSON.stringify({ toUserId })
       });
       const data = await res.json();
+      console.log('Send request response:', data);
       setMessage(data.message || data.error);
-      // Refresh search results (remove the user from results or mark)
+      setMessageType(res.ok ? 'success' : 'error');
       searchUsers();
       fetchPendingRequests();
     } catch (err) {
       console.error('Send request error:', err);
+      setMessage('Error sending request');
+      setMessageType('error');
     }
   };
 
   // Accept friend request
   const acceptRequest = async (requestId) => {
+    console.log('Accept button clicked for request:', requestId);
     try {
       const res = await fetch(`http://localhost:5000/api/friends/accept/${requestId}`, {
         method: 'POST',
@@ -67,15 +77,22 @@ const Friends = () => {
         }
       });
       const data = await res.json();
-      setMessage(data.message);
-      fetchPendingRequests();
+      console.log('Accept response:', data);
+      setMessage(data.message || data.error);
+      setMessageType(res.ok ? 'success' : 'error');
+      if (res.ok) {
+        fetchPendingRequests(); // refresh the list
+      }
     } catch (err) {
       console.error('Accept error:', err);
+      setMessage('Error accepting request');
+      setMessageType('error');
     }
   };
 
   // Decline friend request
   const declineRequest = async (requestId) => {
+    console.log('Decline button clicked for request:', requestId);
     try {
       const res = await fetch(`http://localhost:5000/api/friends/decline/${requestId}`, {
         method: 'POST',
@@ -84,10 +101,16 @@ const Friends = () => {
         }
       });
       const data = await res.json();
-      setMessage(data.message);
-      fetchPendingRequests();
+      console.log('Decline response:', data);
+      setMessage(data.message || data.error);
+      setMessageType(res.ok ? 'success' : 'error');
+      if (res.ok) {
+        fetchPendingRequests(); // refresh the list
+      }
     } catch (err) {
       console.error('Decline error:', err);
+      setMessage('Error declining request');
+      setMessageType('error');
     }
   };
 
@@ -99,7 +122,11 @@ const Friends = () => {
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Friends</h1>
 
-      {message && <p className="text-green-500 mb-2">{message}</p>}
+      {message && (
+        <p className={`mb-2 ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+          {message}
+        </p>
+      )}
 
       {/* Search for users */}
       <div className="mb-6">

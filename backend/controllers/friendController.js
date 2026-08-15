@@ -5,7 +5,7 @@ exports.sendRequest = async (req, res) => {
   try {
     const { toUserId } = req.body;
     const fromUserId = req.userId;
-    
+
     const existing = await FriendRequest.findOne({
       $or: [
         { from_user_id: fromUserId, to_user_id: toUserId },
@@ -13,11 +13,11 @@ exports.sendRequest = async (req, res) => {
       ],
       status: { $ne: 'declined' }
     });
-    
+
     if (existing) {
       return res.status(400).json({ error: 'Request already exists' });
     }
-    
+
     const request = new FriendRequest({
       from_user_id: fromUserId,
       to_user_id: toUserId,
@@ -35,9 +35,18 @@ exports.acceptRequest = async (req, res) => {
     const { requestId } = req.params;
     const request = await FriendRequest.findById(requestId);
     if (!request) return res.status(404).json({ error: 'Request not found' });
-    if (request.to_user_id.toString() !== req.userId) {
+
+    const tokenUserId = req.userId.toString();
+    const toUserId = request.to_user_id.toString();
+
+    console.log('Token user ID:', tokenUserId);
+    console.log('Request to_user_id:', toUserId);
+    console.log('Match:', tokenUserId === toUserId);
+
+    if (tokenUserId !== toUserId) {
       return res.status(403).json({ error: 'Not authorized' });
     }
+
     request.status = 'accepted';
     await request.save();
     res.json({ message: 'Friend request accepted' });
@@ -51,9 +60,18 @@ exports.declineRequest = async (req, res) => {
     const { requestId } = req.params;
     const request = await FriendRequest.findById(requestId);
     if (!request) return res.status(404).json({ error: 'Request not found' });
-    if (request.to_user_id.toString() !== req.userId) {
+
+    const tokenUserId = req.userId.toString();
+    const toUserId = request.to_user_id.toString();
+
+    console.log('Token user ID:', tokenUserId);
+    console.log('Request to_user_id:', toUserId);
+    console.log('Match:', tokenUserId === toUserId);
+
+    if (tokenUserId !== toUserId) {
       return res.status(403).json({ error: 'Not authorized' });
     }
+
     request.status = 'declined';
     await request.save();
     res.json({ message: 'Friend request declined' });

@@ -10,6 +10,9 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  // Check if user has admin role
+  const isAdmin = user?.role === 'admin';
+
   return (
     <nav className="bg-gray-800 text-white p-4">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
@@ -17,6 +20,9 @@ const Navbar = () => {
           <Link to="/" className="hover:text-gray-300">Home</Link>
           <Link to="/feed" className="hover:text-gray-300">Feed</Link>
           <Link to="/friends" className="hover:text-gray-300">Friends</Link>
+          {isAdmin && (
+            <Link to="/admin" className="hover:text-gray-300 text-yellow-300">Admin</Link>
+          )}
         </div>
         <div className="flex items-center space-x-4">
           <span>{user?.name}</span>
