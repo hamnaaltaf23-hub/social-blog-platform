@@ -2,9 +2,11 @@
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
 import Friends from './pages/Friends';
+import FriendList from './pages/FriendList';
 import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 
@@ -14,12 +16,18 @@ function ProtectedRoute({ children }) {
 }
 
 function AppRoutes() {
+  const { user } = useAuth();
+
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={user ? <Navigate to="/feed" /> : <Login />} />
+      <Route path="/register" element={user ? <Navigate to="/feed" /> : <Register />} />
+
+      {/* Protected Routes (require login) */}
       <Route
-        path="/"
+        path="/home"
         element={
           <ProtectedRoute>
             <>
@@ -47,6 +55,17 @@ function AppRoutes() {
             <>
               <Navbar />
               <Friends />
+            </>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/friends/list"
+        element={
+          <ProtectedRoute>
+            <>
+              <Navbar />
+              <FriendList />
             </>
           </ProtectedRoute>
         }

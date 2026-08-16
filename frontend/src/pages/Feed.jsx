@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 const Feed = () => {
   const [posts, setPosts] = useState([]);
   const [content, setContent] = useState('');
+  const [visibility, setVisibility] = useState('public');
   const [commentText, setCommentText] = useState({});
   const [showCommentInput, setShowCommentInput] = useState({});
   const { user } = useAuth();
@@ -32,11 +33,12 @@ const Feed = () => {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ content })
+        body: JSON.stringify({ content, visibility })
       });
       const data = await res.json();
       console.log('Post created:', data);
       setContent('');
+      setVisibility('public');
       fetchPosts();
     } catch (err) {
       console.error('Create error:', err);
@@ -103,12 +105,24 @@ const Feed = () => {
           className="w-full border rounded p-2"
           rows="3"
         />
-        <button 
-          type="submit" 
-          className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-        >
-          Post
-        </button>
+        <div className="flex items-center mt-2">
+          <label className="mr-2 font-semibold">Privacy:</label>
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+            className="border rounded p-1"
+          >
+            <option value="public">Public</option>
+            <option value="friends">Friends Only</option>
+            <option value="private">Private</option>
+          </select>
+          <button 
+            type="submit" 
+            className="bg-blue-500 text-white px-4 py-2 rounded ml-4 hover:bg-blue-600"
+          >
+            Post
+          </button>
+        </div>
       </form>
 
       <div>
@@ -118,10 +132,15 @@ const Feed = () => {
         
         {posts.map(post => (
           <div key={post._id} className="border rounded p-4 mb-4 shadow">
-            <div className="flex items-center mb-2">
-              <span className="font-bold">{post.author_id?.name || 'Unknown'}</span>
-              <span className="text-sm text-gray-500 ml-2">
-                {new Date(post.created_at).toLocaleString()}
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <span className="font-bold">{post.author_id?.name || 'Unknown'}</span>
+                <span className="text-sm text-gray-500 ml-2">
+                  {new Date(post.created_at).toLocaleString()}
+                </span>
+              </div>
+              <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+                {post.visibility || 'public'}
               </span>
             </div>
             <p className="mb-2">{post.content}</p>
@@ -162,7 +181,6 @@ const Feed = () => {
               </div>
             )}
 
-            {/* Display Comments */}
             {post.comments && post.comments.length > 0 && (
               <div className="mt-3 pl-4 border-l-2 border-gray-300">
                 {post.comments.map(comment => (

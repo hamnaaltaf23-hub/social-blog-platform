@@ -144,7 +144,7 @@ const Admin = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-500 text-white p-4 rounded shadow">
+        <div className="bg-primary text-white p-4 rounded shadow">
           <h3 className="text-lg">Total Users</h3>
           <p className="text-2xl font-bold">{stats?.totalUsers || 0}</p>
         </div>
@@ -152,7 +152,7 @@ const Admin = () => {
           <h3 className="text-lg">Total Posts</h3>
           <p className="text-2xl font-bold">{stats?.totalPosts || 0}</p>
         </div>
-        <div className="bg-yellow-500 text-white p-4 rounded shadow">
+        <div className="bg-primary-lighter text-white p-4 rounded shadow">
           <h3 className="text-lg">Total Comments</h3>
           <p className="text-2xl font-bold">{stats?.totalComments || 0}</p>
         </div>
@@ -246,7 +246,7 @@ const Admin = () => {
                   {c.status === 'flagged' && (
                     <button
                       onClick={() => moderateComment(c._id, 'approved')}
-                      className="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 mr-1"
+                      className="bg-primary-light text-white px-2 py-1 rounded text-sm hover:bg-green-600 mr-1"
                     >
                       Approve
                     </button>

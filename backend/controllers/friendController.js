@@ -1,6 +1,7 @@
 const FriendRequest = require('../models/FriendRequest');
 const User = require('../models/User');
 
+// Send a friend request
 exports.sendRequest = async (req, res) => {
   try {
     const { toUserId } = req.body;
@@ -30,6 +31,7 @@ exports.sendRequest = async (req, res) => {
   }
 };
 
+// Accept a friend request
 exports.acceptRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -38,10 +40,6 @@ exports.acceptRequest = async (req, res) => {
 
     const tokenUserId = req.userId.toString();
     const toUserId = request.to_user_id.toString();
-
-    console.log('Token user ID:', tokenUserId);
-    console.log('Request to_user_id:', toUserId);
-    console.log('Match:', tokenUserId === toUserId);
 
     if (tokenUserId !== toUserId) {
       return res.status(403).json({ error: 'Not authorized' });
@@ -55,6 +53,7 @@ exports.acceptRequest = async (req, res) => {
   }
 };
 
+// Decline a friend request
 exports.declineRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -63,10 +62,6 @@ exports.declineRequest = async (req, res) => {
 
     const tokenUserId = req.userId.toString();
     const toUserId = request.to_user_id.toString();
-
-    console.log('Token user ID:', tokenUserId);
-    console.log('Request to_user_id:', toUserId);
-    console.log('Match:', tokenUserId === toUserId);
 
     if (tokenUserId !== toUserId) {
       return res.status(403).json({ error: 'Not authorized' });
@@ -80,6 +75,7 @@ exports.declineRequest = async (req, res) => {
   }
 };
 
+// Get pending friend requests for current user
 exports.getPendingRequests = async (req, res) => {
   try {
     const requests = await FriendRequest.find({
@@ -87,6 +83,33 @@ exports.getPendingRequests = async (req, res) => {
       status: 'pending'
     }).populate('from_user_id', 'name email avatar');
     res.json(requests);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// NEW: Get all accepted friends of the current user
+exports.getFriends = async (req, res) => {
+  try {
+    const currentUserId = req.userId;
+
+    const friendRequests = await FriendRequest.find({
+      $or: [
+        { from_user_id: currentUserId, status: 'accepted' },
+        { to_user_id: currentUserId, status: 'accepted' }
+      ]
+    }).populate('from_user_id', 'name email avatar')
+      .populate('to_user_id', 'name email avatar');
+
+    const friends = friendRequests.map(req => {
+      if (req.from_user_id._id.toString() === currentUserId) {
+        return req.to_user_id;
+      } else {
+        return req.from_user_id;
+      }
+    });
+
+    res.json(friends);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

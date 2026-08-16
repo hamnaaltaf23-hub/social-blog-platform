@@ -1,1 +1,14 @@
 ﻿@import "tailwindcss";
+
+@theme {
+  --color-primary: #1E2A5A;
+  --color-primary-light: #2E3E7A;
+  --color-primary-lighter: #4A5DA6;
+  --color-bg-page: #D0D9F0; /* two shades lighter than #5A6EBA */
+}
+
+body {
+  background-color: var(--color-bg-page);
+  margin: 0;
+  padding: 0;
+}

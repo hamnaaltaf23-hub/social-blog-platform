@@ -8,6 +8,7 @@ const postRoutes = require('./routes/posts');
 const friendRoutes = require('./routes/friends');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+const blogRoutes = require('./routes/blog');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/blog', blogRoutes);  // <-- NEW: Blog routes
 
 // Test route
 app.get('/api/test', (req, res) => {

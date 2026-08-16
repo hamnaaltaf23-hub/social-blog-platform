@@ -1,5 +1,6 @@
 ﻿const Post = require('../models/Post');
 const Comment = require('../models/Comment');
+const FriendRequest = require('../models/FriendRequest');
 
 exports.createPost = async (req, res) => {
   try {
@@ -20,15 +21,43 @@ exports.createPost = async (req, res) => {
 
 exports.getFeed = async (req, res) => {
   try {
-    const posts = await Post.find({ visibility: 'public' })
-      .sort({ created_at: -1 })
+    const currentUserId = req.userId;
+
+    // Get all accepted friends
+    const friendRequests = await FriendRequest.find({
+      $or: [
+        { from_user_id: currentUserId, status: 'accepted' },
+        { to_user_id: currentUserId, status: 'accepted' }
+      ]
+    });
+
+    const friendIds = friendRequests.map(req =>
+      req.from_user_id.toString() === currentUserId
+        ? req.to_user_id.toString()
+        : req.from_user_id.toString()
+    );
+
+    // Fetch posts
+    const posts = await Post.find()
       .populate('author_id', 'name avatar')
       .populate({
         path: 'comments',
         populate: { path: 'user_id', select: 'name avatar' }
       })
+      .sort({ created_at: -1 })
       .limit(20);
-    res.json(posts);
+
+    // Filter by visibility
+    const filteredPosts = posts.filter(post => {
+      const authorId = post.author_id._id.toString();
+
+      if (post.visibility === 'public') return true;
+      if (post.visibility === 'friends') return friendIds.includes(authorId);
+      if (post.visibility === 'private') return authorId === currentUserId;
+      return false;
+    });
+
+    res.json(filteredPosts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

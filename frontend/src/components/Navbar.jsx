@@ -10,25 +10,25 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  // Check if user has admin role
   const isAdmin = user?.role === 'admin';
 
   return (
-    <nav className="bg-gray-800 text-white p-4">
+    <nav className="bg-primary text-white p-4 shadow-md">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <div className="flex space-x-6">
-          <Link to="/" className="hover:text-gray-300">Home</Link>
-          <Link to="/feed" className="hover:text-gray-300">Feed</Link>
-          <Link to="/friends" className="hover:text-gray-300">Friends</Link>
+          <Link to="/" className="hover:text-primary-lighter transition-colors">Home</Link>
+          <Link to="/feed" className="hover:text-primary-lighter transition-colors">Feed</Link>
+          <Link to="/friends" className="hover:text-primary-lighter transition-colors">Friends</Link>
+          <Link to="/friends/list" className="hover:text-primary-lighter transition-colors">Friends List</Link>
           {isAdmin && (
-            <Link to="/admin" className="hover:text-gray-300 text-yellow-300">Admin</Link>
+            <Link to="/admin" className="hover:text-primary-lighter transition-colors text-yellow-300">Admin</Link>
           )}
         </div>
         <div className="flex items-center space-x-4">
           <span>{user?.name}</span>
           <button
             onClick={handleLogout}
-            className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+            className="bg-primary-lighter hover:bg-primary-light px-3 py-1 rounded transition-colors"
           >
             Logout
           </button>

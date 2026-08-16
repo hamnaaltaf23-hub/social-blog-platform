@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,42 +16,47 @@ const Login = () => {
     setError('');
     const result = await login(email, password);
     if (result.success) {
-      navigate('/');
+      navigate('/feed');
     } else {
       setError(result.error);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen flex items-center justify-center bg-transparent"
+    >
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-center">Login</h2>
+        <h2 className="text-3xl font-bold text-center text-[#1E2A5A]">Login</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium">Email</label>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-[#1E2A5A] focus:border-[#1E2A5A]"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Password</label>
+            <label className="block text-sm font-medium text-gray-700">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 pr-10"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 pr-10 focus:ring-[#1E2A5A] focus:border-[#1E2A5A]"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
                 {showPassword ? '🙈' : '👁️'}
               </button>
@@ -59,16 +65,16 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:opacity-50"
+            className="w-full bg-[#1E2A5A] text-white py-2 rounded-md hover:bg-[#2E3E7A] transition-colors disabled:opacity-50"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <p className="text-center">
-          Don't have an account? <Link to="/register" className="text-blue-500">Register</Link>
+        <p className="text-center text-gray-600">
+          Don't have an account? <Link to="/register" className="text-[#4A5DA6] hover:underline">Register</Link>
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
