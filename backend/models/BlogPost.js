@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const BlogPostSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  content: { type: String, required: true }, // Rich text (HTML from editor)
+  content: { type: String, required: true },
   excerpt: { type: String, default: '' },
   coverImage: { type: String, default: '' },
   category: { type: String, default: 'General' },
@@ -14,10 +14,9 @@ const BlogPostSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-// Update the updated_at timestamp on save
-BlogPostSchema.pre('save', function(next) {
+// Correct pre-save hook – no "next" parameter needed if we use an async function
+BlogPostSchema.pre('save', function() {
   this.updated_at = Date.now();
-  next();
 });
 
 module.exports = mongoose.model('BlogPost', BlogPostSchema);

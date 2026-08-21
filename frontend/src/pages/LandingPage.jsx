@@ -12,9 +12,9 @@ const LandingPage = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {/* 3D Hero - full screen, with lighter background */}
-      <div className="absolute inset-0 z-0">
-        <HeroScene bgColor="#5A6EBA" />
+      {/* 3D Hero - full screen with instant background color */}
+      <div className="absolute inset-0 z-0 bg-[#5A6EBA]">
+        <HeroScene />
       </div>
 
       {/* Overlay Content - no glass card, direct text and buttons */}
@@ -24,7 +24,7 @@ const LandingPage = () => {
             Connect & Share
           </h1>
           <p className="text-2xl text-white/90 drop-shadow-md mb-10">
-            A modern social blogging platform
+            a modern social blogging platform
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <Link
@@ -43,6 +43,7 @@ const LandingPage = () => {
         </div>
       </div>
 
+      {/* Floating animation CSS */}
       <style>{`
         .floating-btn {
           animation: float 3s ease-in-out infinite;

@@ -20,6 +20,8 @@ const Navbar = () => {
           <Link to="/feed" className="hover:text-primary-lighter transition-colors">Feed</Link>
           <Link to="/friends" className="hover:text-primary-lighter transition-colors">Friends</Link>
           <Link to="/friends/list" className="hover:text-primary-lighter transition-colors">Friends List</Link>
+          <Link to="/blog" className="hover:text-primary-lighter transition-colors">Blog</Link>
+          <Link to="/profile" className="hover:text-primary-lighter transition-colors">Profile</Link>
           {isAdmin && (
             <Link to="/admin" className="hover:text-primary-lighter transition-colors text-yellow-300">Admin</Link>
           )}

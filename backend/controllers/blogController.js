@@ -1,14 +1,35 @@
-const BlogPost = require('../models/BlogPost');
+﻿const BlogPost = require('../models/BlogPost');
+const path = require('path');
+const fs = require('fs');
 
-// Create a new blog post
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 exports.createPost = async (req, res) => {
   try {
     const { title, content, excerpt, coverImage, category, tags, status } = req.body;
+    let coverImageUrl = '';
+
+    // If coverImage is a base64 string, save it as a file
+    if (coverImage && coverImage.startsWith('data:image')) {
+      const matches = coverImage.match(/^data:image\/(\w+);base64,/);
+      const ext = matches ? matches[1] : 'jpg';
+      const base64Data = coverImage.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.' + ext;
+      const filePath = path.join(uploadDir, filename);
+      fs.writeFileSync(filePath, buffer);
+      coverImageUrl = `http://localhost:5000/uploads/${filename}`;
+    }
+
     const post = new BlogPost({
       title,
       content,
       excerpt: excerpt || content.substring(0, 150),
-      coverImage: coverImage || '',
+      coverImage: coverImageUrl,
       category: category || 'General',
       tags: tags || [],
       author_id: req.userId,
@@ -18,16 +39,15 @@ exports.createPost = async (req, res) => {
     await post.populate('author_id', 'name email avatar');
     res.status(201).json(post);
   } catch (err) {
+    console.error('Create post error:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// Get all published blog posts (public)
 exports.getAllPosts = async (req, res) => {
   try {
     const { category, tag, search } = req.query;
     let query = { status: 'published' };
-    
     if (category) query.category = category;
     if (tag) query.tags = tag;
     if (search) {
@@ -36,7 +56,6 @@ exports.getAllPosts = async (req, res) => {
         { content: { $regex: search, $options: 'i' } }
       ];
     }
-
     const posts = await BlogPost.find(query)
       .populate('author_id', 'name email avatar')
       .sort({ created_at: -1 })
@@ -47,7 +66,6 @@ exports.getAllPosts = async (req, res) => {
   }
 };
 
-// Get all posts for the logged-in author (including drafts)
 exports.getMyPosts = async (req, res) => {
   try {
     const posts = await BlogPost.find({ author_id: req.userId })
@@ -59,13 +77,11 @@ exports.getMyPosts = async (req, res) => {
   }
 };
 
-// Get a single blog post by ID
 exports.getPostById = async (req, res) => {
   try {
     const post = await BlogPost.findById(req.params.postId)
       .populate('author_id', 'name email avatar');
     if (!post) return res.status(404).json({ error: 'Post not found' });
-    // Increment view count (if published)
     if (post.status === 'published') {
       post.views += 1;
       await post.save();
@@ -76,13 +92,11 @@ exports.getPostById = async (req, res) => {
   }
 };
 
-// Update a blog post
 exports.updatePost = async (req, res) => {
   try {
     const { title, content, excerpt, coverImage, category, tags, status } = req.body;
     const post = await BlogPost.findById(req.params.postId);
     if (!post) return res.status(404).json({ error: 'Post not found' });
-    // Check authorization
     if (post.author_id.toString() !== req.userId) {
       return res.status(403).json({ error: 'Not authorized' });
     }
@@ -101,7 +115,6 @@ exports.updatePost = async (req, res) => {
   }
 };
 
-// Delete a blog post
 exports.deletePost = async (req, res) => {
   try {
     const post = await BlogPost.findById(req.params.postId);
@@ -116,7 +129,6 @@ exports.deletePost = async (req, res) => {
   }
 };
 
-// Get all unique categories (for filter)
 exports.getCategories = async (req, res) => {
   try {
     const categories = await BlogPost.distinct('category', { status: 'published' });
@@ -126,13 +138,10 @@ exports.getCategories = async (req, res) => {
   }
 };
 
-// Get all unique tags
 exports.getTags = async (req, res) => {
   try {
     const tags = await BlogPost.distinct('tags', { status: 'published' });
-    // flatten array of arrays
     const flattened = tags.flat();
-    // get unique
     const unique = [...new Set(flattened)];
     res.json(unique);
   } catch (err) {
