@@ -14,27 +14,27 @@ const profileRoutes = require('./routes/profile');
 
 const app = express();
 
-connectDB();
+try {
+  connectDB();
 
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use('/uploads', express.static('uploads'));
+  app.use(cors());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/friends', friendRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/blog', blogRoutes);
-app.use('/api/profile', profileRoutes);
+  app.use('/api/auth', authRoutes);
+  app.use('/api/posts', postRoutes);
+  app.use('/api/friends', friendRoutes);
+  app.use('/api/users', userRoutes);
+  app.use('/api/admin', adminRoutes);
+  app.use('/api/blog', blogRoutes);
+  app.use('/api/profile', profileRoutes);
 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend is running!' });
-});
+  app.get('/api/test', (req, res) => {
+    res.json({ message: 'Backend is running on Vercel!' });
+  });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+} catch (err) {
+  console.error('Startup error:', err);
+}
+
+module.exports = app;
